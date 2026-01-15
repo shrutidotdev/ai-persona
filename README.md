@@ -2,7 +2,7 @@
 
 <p>
   AI Persona Maker is an experimental web app that lets users chat with AI personalities inspired by iconic innovators and leaders.  
-Instead of a generic assistant, users **choose a voice** — each with a distinct mindset, tone, and way of thinking.
+Instead of a generic assistant, users choose a voice — each with a distinct mindset, tone, and way of thinking.
 </p>
 
 
