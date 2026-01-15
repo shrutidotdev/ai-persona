@@ -137,7 +137,7 @@ function PersonaCard({
         <div className="absolute bottom-0 left-0 w-px h-full bg-yellow-400" />
       </motion.div>
 
-      {/* Click indicator */}
+
       <motion.div
         className="absolute inset-0 border-2 border-yellow-400 pointer-events-none"
         initial={{ opacity: 0, scale: 0.95 }}

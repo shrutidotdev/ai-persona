@@ -20,10 +20,10 @@ const MessageBubble = ({ message }: MessageProp) => {
       className={`flex mb-4 ${isUser ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`max-w-[80%] px-4 py-3 font-mono text-sm transition-all duration-300 
-        ${isUser ? "bg-yellow-400 text-black font-semibold" : "bg-gray-900 text-white"}`}
+        className={` px-4 py-3 font-mono text-sm transition-all duration-300 max-w-[70%]
+        ${isUser ? "bg-yellow-400 text-black" : "bg-gray-900 text-white border border-gray-700"}`}
       >
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
       </div>
     </motion.div>
   )
