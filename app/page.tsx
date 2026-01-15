@@ -1,4 +1,4 @@
-import PersonaSelector from "./components/PersonaSelector";
+// import PersonaSelector from "./components/PersonaSelector";
 import { PersonaSection } from "./components/PersonaSection";
 
 export default function Home() {

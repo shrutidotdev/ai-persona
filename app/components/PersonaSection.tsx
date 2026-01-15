@@ -4,8 +4,9 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import PersonaCard from "./PersonaCard";
 import { Persona } from "../types/persona";
+import { useRouter } from "next/navigation";
 
-const PERSONAS: Persona[] = [
+export const PERSONAS: Persona[] = [
   {
     id: 1,
     name: "Elon Musk",
@@ -13,6 +14,7 @@ const PERSONAS: Persona[] = [
     description: "Direct, innovative, and boldly forward-looking perspective",
     image: "/elon.webp",
     traits: ["Visionary", "Tech-focused", "Direct", "Future-thinking"],
+    slug: "elon-musk",
   },
   {
     id: 2,
@@ -21,6 +23,7 @@ const PERSONAS: Persona[] = [
     description: "High-energy, motivational, and no-nonsense approach",
     image: "/gary.png",
     traits: ["Energetic", "Motivational", "Hustler", "Authentic"],
+    slug: "gary-vee",
   },
   {
     id: 3,
@@ -29,6 +32,7 @@ const PERSONAS: Persona[] = [
     description: "Simplicity-first and user experience obsessed philosophy",
     image: "/stevejobs.webp",
     traits: ["Elegant", "User-focused", "Visionary", "Minimalist"],
+    slug: "steve-jobs",
   },
   {
     id: 4,
@@ -37,18 +41,20 @@ const PERSONAS: Persona[] = [
     description: "Warm, compassionate, and deeply connected to people",
     image: "/oprah.avif",
     traits: ["Empathetic", "Inspiring", "Connected", "Growth-focused"],
+    slug: "oprah-winfrey",
   },
 ];
 
 export function PersonaSection() {
+  const router = useRouter()
   const headerRef = useRef(null);
   const gridRef = useRef(null);
 
   const headerInView = useInView(headerRef, { once: false, amount: 1 });
   const gridInView = useInView(gridRef, { once: false, amount: 0.1 });
 
-  const handlePersonaClick = (personaId: number) => {
-    alert(`Navigate to- ${personaId}`);
+  const handlePersonaClick = (slug: string) => {
+    router.push(`/chat/${slug}`);
   };
 
   return (
@@ -59,7 +65,7 @@ export function PersonaSection() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Section header */}
+  
       <motion.div
         ref={headerRef}
         className="mb-16 flex items-end justify-between"
@@ -103,7 +109,7 @@ export function PersonaSection() {
             key={persona.id}
             persona={persona}
             index={index}
-            onClick={() => handlePersonaClick(persona.id)}
+            onClick={() => handlePersonaClick(persona.slug)}
           />
         ))}
       </motion.div>
