@@ -1,4 +1,3 @@
-import { error } from "console";
 import { NextRequest } from "next/server";
 import OpenAI from "openai";
 
