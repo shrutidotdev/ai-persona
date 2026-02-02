@@ -2,8 +2,8 @@ import { Persona } from "../types/persona";
 
 import { useState, useRef } from "react";
 import { cubicBezier, motion, useInView } from "framer-motion";
-import { cn } from "../lib/utils";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 function PersonaCard({
   persona,

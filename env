@@ -1,3 +1,5 @@
+# don't forget to make this file .env it's currently just env and off add your own key
+
 OPENAI_API_KEY=
 
 

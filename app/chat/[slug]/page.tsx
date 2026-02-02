@@ -28,7 +28,6 @@ const ChatPage = () => {
     <div className="min-h-screen bg-black p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
         <BackToPersona />
-
         <ChatInterface personaSlug={slug} personaName={persona.name} />
       </div>
     </div>
