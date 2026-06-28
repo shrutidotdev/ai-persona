@@ -39,8 +39,8 @@ function PersonaCard({
       ref={cardRef}
       variants={cardVariants}
       className={cn(
-        "group relative border border-border/40 p-5 flex flex-col justify-between transition-colors duration-500 cursor-pointer overflow-hidden",
-        isActive && "border-white"
+        "group relative border border-white/15 p-5 flex flex-col justify-between transition-colors duration-500 cursor-pointer overflow-hidden bg-black",
+        isActive && "border-yellow-400"
       )}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
@@ -87,14 +87,14 @@ function PersonaCard({
           transition={{ duration: 0.2 }}
           className="px-6 py-3 bg-yellow-400 text-black cursor-pointer"
         >
-          <span className="font-bebas text-2xl">Start Charting</span>
+          <span className="font-bebas text-2xl">Start Chatting</span>
         </motion.button>
       </div>
 
       {/* Description - reveals on hover */}
       <div className="relative z-10">
         <motion.p
-          className="font-mono text-[12px] text-muted-foreground max-w-70"
+          className="font-mono text-[12px] text-neutral-400 max-w-70"
           initial={{ opacity: 0, y: 8 }}
           animate={{
             opacity: isActive ? 1 : 0.9,
@@ -110,7 +110,7 @@ function PersonaCard({
       <span
         className={cn(
           "absolute top-9 right-4 font-mono text-[10px] transition-colors duration-300",
-          isActive ? "text-accent" : "text-muted-foreground/40"
+          isActive ? "text-yellow-400" : "text-neutral-600"
         )}
       >
         {String(index + 1).padStart(2, "0")}

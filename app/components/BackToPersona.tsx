@@ -11,7 +11,7 @@ const BackToPersona = () => {
     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <Button
         onClick={() => router.push("/")}
-        className="mb-4 bg-yellow-400 text-black hover:bg-yellow-500 font-bebas text-lg transition-all duration-300"
+        className="bg-yellow-400 text-black hover:bg-yellow-300 font-bebas text-lg tracking-wide transition-all duration-300"
       >
         ← Back to Personas
       </Button>

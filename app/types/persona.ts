@@ -6,4 +6,5 @@ export interface Persona {
   image: string;
   traits: string[];
   slug: string;
+  systemPrompt: string;
 }

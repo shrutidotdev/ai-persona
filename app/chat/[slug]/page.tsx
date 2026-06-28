@@ -1,23 +1,26 @@
 "use client";
 
-import BackToPersona from "@/app/components/BackToPersona";
+import { getPersonaBySlug } from "@/lib/personas";
 import ChatInterface from "@/app/components/ChatInterface";
-import { PERSONAS } from "@/app/components/PersonaSection";
+import BackToPersona from "@/app/components/BackToPersona";
 import { useParams } from "next/navigation";
 
 const ChatPage = () => {
   const params = useParams();
   const slug = params.slug as string;
-
-  const persona = PERSONAS.find((p) => p.slug === slug);
+  const persona = getPersonaBySlug(slug);
 
   if (!persona) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bebas text-white mb-4">
-            Persona not found
-          </h1>
+      <div className="min-h-screen bg-black flex items-center justify-center px-6">
+        <div className="text-center space-y-6">
+          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-yellow-400">
+            404
+          </span>
+          <h1 className="font-bebas text-5xl text-white">Coach Not Found</h1>
+          <p className="font-mono text-sm text-neutral-400">
+            This persona doesn&apos;t exist. Pick one from the home page.
+          </p>
           <BackToPersona />
         </div>
       </div>
@@ -25,11 +28,8 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
-        <BackToPersona />
-        <ChatInterface personaSlug={slug} personaName={persona.name} />
-      </div>
+    <div className="min-h-screen bg-black">
+      <ChatInterface persona={persona} />
     </div>
   );
 };

@@ -17,8 +17,9 @@ const bebasNeue = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--f
 
 
 export const metadata: Metadata = {
-  title: "AI Personas Chat",
-  description: "Chat with AI personalities inspired by iconic innovators and leaders",
+  title: "Pitch Persona — Practice Your Startup Pitch",
+  description:
+    "Practice your startup pitch with AI coaches inspired by iconic leaders. Get feedback before you build your slides.",
 };
 
 export default function RootLayout({
@@ -27,12 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body 
-        className={`${ibmPlexSans.variable} ${bebasNeue.variable} ${ibmPlexMono.variable} antialiased overflow-x-hidden`}
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body
+        className={`${ibmPlexSans.variable} ${bebasNeue.variable} ${ibmPlexMono.variable} antialiased overflow-x-hidden bg-black text-white`}
       >
-        {children}
          <Toaster />
+        {children}
       </body>
     </html>
   );
