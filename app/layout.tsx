@@ -1,3 +1,5 @@
+import {ClerkProvider} from "@clerk/nextjs";
+import { shadcn } from "@clerk/ui/themes";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
@@ -32,8 +34,10 @@ export default function RootLayout({
       <body
         className={`${ibmPlexSans.variable} ${bebasNeue.variable} ${ibmPlexMono.variable} antialiased overflow-x-hidden bg-black text-white`}
       >
-         <Toaster />
-        {children}
+        <ClerkProvider appearance={{ theme: shadcn }}>
+          <Toaster />
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
