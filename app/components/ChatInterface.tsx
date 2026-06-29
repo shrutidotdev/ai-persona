@@ -3,11 +3,13 @@
 import { Input } from "@/components/ui/input";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader, Copy, RefreshCw, ArrowLeft } from "lucide-react";
+import { Send, Loader, Copy, RefreshCw, ArrowLeft, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { storageKey } from "@/lib/chat";
 import { Persona } from "@/app/types/persona";
+import { ScoreResponse } from "@/app/types/scorecard";
+import { Scorecard } from "./Scorecard";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -51,6 +53,10 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [scorecard, setScorecard] = useState<ScoreResponse | null>(null);
+  const [isScoring, setIsScoring] = useState(false);
+  const [followupQuestions, setFollowupQuestions] = useState<string[]>([]);
+  const [isGeneratingFollowups, setIsGeneratingFollowups] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -129,6 +135,15 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
             return updated;
           });
         }
+
+        // Generate followup questions after streaming completes
+        const updatedHistory = [...conversationHistory];
+        updatedHistory.push({
+          role: "assistant",
+          content: assistantMessage,
+          id: tempId,
+        });
+        await generateFollowupQuestions();
       }
     },
     [persona.slug]
@@ -205,8 +220,69 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
     toast.success("Response regenerated!");
   };
 
+  const scorePitch = async () => {
+    if (messages.length < 2) {
+      toast.error("Have a longer conversation before scoring");
+      return;
+    }
+
+    setIsScoring(true);
+    try {
+      const response = await fetch("/api/score-pitch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messages.map(({ role, content }) => ({
+            role,
+            content,
+          })),
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to score pitch");
+
+      const { data } = await response.json();
+      setScorecard(data);
+      toast.success("Pitch scored!");
+    } catch (error) {
+      console.error("Scoring error:", error);
+      toast.error("Failed to score pitch. Try again.");
+    } finally {
+      setIsScoring(false);
+    }
+  };
+
+  const generateFollowupQuestions = async () => {
+    if (messages.length < 2) return;
+
+    setIsGeneratingFollowups(true);
+    try {
+      const response = await fetch("/api/followup-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messages.map(({ role, content }) => ({
+            role,
+            content,
+          })),
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate questions");
+
+      const { questions } = await response.json();
+      setFollowupQuestions(questions || []);
+    } catch (error) {
+      console.error("Followup questions error:", error);
+      setFollowupQuestions([]);
+    } finally {
+      setIsGeneratingFollowups(false);
+    }
+  };
+
   const handleClearChat = () => {
     setMessages([]);
+    setFollowupQuestions([]);
     localStorage.removeItem(storageKey(persona.slug));
     toast.success("Conversation cleared");
   };
@@ -253,9 +329,27 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
         <button
           onClick={handleClearChat}
           disabled={messages.length === 0 || isLoading}
-          className="font-mono text-xs text-neutral-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="font-mono text-xs text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           Clear
+        </button>
+
+        <button
+          onClick={scorePitch}
+          disabled={messages.length < 2 || isLoading || isScoring}
+          className="font-mono text-xs text-white hover:text-yellow-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+        >
+          {isScoring ? (
+            <>
+              <Loader className="w-3 h-3 animate-spin" />
+              <span className="hidden sm:inline">Scoring...</span>
+            </>
+          ) : (
+            <>
+              <Zap className="w-3 h-3" />
+              <span className="hidden sm:inline">Score</span>
+            </>
+          )}
         </button>
       </header>
 
@@ -326,7 +420,7 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
                             onClick={() => handleCopy(message.content)}
                             variant="ghost"
                             size="sm"
-                            className="font-mono text-xs text-neutral-500 hover:text-white hover:bg-white/5"
+                            className="font-mono text-xs text-white hover:text-white hover:bg-white/5"
                           >
                             <Copy className="w-3 h-3" />
                             Copy
@@ -336,10 +430,24 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
                             disabled={isLoading}
                             variant="ghost"
                             size="sm"
-                            className="font-mono text-xs text-neutral-500 hover:text-white hover:bg-white/5"
+                            className="font-mono text-xs text-white hover:text-white hover:bg-white/5"
                           >
                             <RefreshCw className="w-3 h-3" />
                             Retry
+                          </Button>
+                          <Button
+                            onClick={scorePitch}
+                            disabled={isLoading || isScoring || messages.length < 2}
+                            variant="ghost"
+                            size="sm"
+                            className="font-mono text-xs text-white hover:text-yellow-400 hover:bg-yellow-400/5"
+                          >
+                            {isScoring ? (
+                              <Loader className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <Zap className="w-3 h-3" />
+                            )}
+                            {isScoring ? "Scoring" : "Score"}
                           </Button>
                         </div>
                       )}
@@ -362,6 +470,37 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {/* Follow-up Questions */}
+                <AnimatePresence>
+                  {followupQuestions.length > 0 && !isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-2 mt-4"
+                    >
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+                        💡 Ask instead:
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {followupQuestions.map((question, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              sendMessage(question);
+                              setFollowupQuestions([]);
+                            }}
+                            disabled={isLoading}
+                            className="text-left px-3 py-2 text-xs font-mono text-neutral-300 bg-neutral-900 border border-white/10 hover:border-yellow-400 hover:text-yellow-400 transition-colors disabled:opacity-50"
+                          >
+                            {question}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
@@ -378,7 +517,7 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={isLoading}
-              className="flex-1 h-12 bg-neutral-900 text-white border-white/15 font-mono text-sm placeholder:text-neutral-500 focus:border-yellow-400 focus:ring-yellow-400/20 disabled:opacity-50"
+              className="flex-1 h-12 bg-neutral-900 text-white border-white/15 font-mono text-sm placeholder:text-white focus:border-yellow-400 focus:ring-yellow-400/20 disabled:opacity-50"
             />
             <Button
               type="submit"
@@ -397,6 +536,15 @@ const ChatInterface = ({ persona }: ChatInterfaceProps) => {
           </div>
         </form>
       </footer>
+
+      <AnimatePresence>
+        {scorecard && (
+          <Scorecard
+            score={scorecard}
+            onClose={() => setScorecard(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
