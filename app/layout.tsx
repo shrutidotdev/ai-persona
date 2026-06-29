@@ -37,13 +37,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${ibmPlexSans.variable} ${bebasNeue.variable} ${ibmPlexMono.variable} antialiased overflow-x-hidden bg-black text-white`}
+        className={`${ibmPlexSans.variable} ${bebasNeue.variable} ${ibmPlexMono.variable} min-h-screen antialiased overflow-x-hidden bg-black text-white`}
       >
-         <ClerkProvider>
+        <ClerkProvider>
           <Toaster richColors position="top-right" />
-          
-          <Header />
-          {children}
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+          </div>
         </ClerkProvider>
       </body>
     </html>
