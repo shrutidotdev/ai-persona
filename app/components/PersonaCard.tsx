@@ -71,7 +71,7 @@ function PersonaCard({
           {persona.name}
         </h3>
 
-        <div className="relative w-full h-94 overflow-hidden">
+        <div className="relative w-full h-[24rem] overflow-hidden">
           <Image
             src={persona.image}
             alt={persona.name}
@@ -94,7 +94,7 @@ function PersonaCard({
       {/* Description - reveals on hover */}
       <div className="relative z-10">
         <motion.p
-          className="font-mono text-[12px] text-neutral-400 max-w-70"
+          className="font-mono text-[12px] text-neutral-400 max-w-full break-words leading-relaxed"
           initial={{ opacity: 0, y: 8 }}
           animate={{
             opacity: isActive ? 1 : 0.9,
