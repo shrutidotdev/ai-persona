@@ -1,8 +1,36 @@
 import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
-import { NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-export async function GET(req: NextRequest) {
+type PersonaCountRow = {
+  persona_slug: string;
+};
+
+type RecentSessionRow = {
+  id: string;
+  user_id: string;
+  persona_slug: string;
+  title: string | null;
+  created_at: string;
+  messages?: { id: string }[];
+};
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceRoleKey) {
+  throw new Error(
+    "Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required."
+  );
+}
+
+const db = createClient(supabaseUrl, supabaseServiceRoleKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+  },
+});
+
+export async function GET() {
   const { userId } = await auth();
 
   if (!userId || userId !== "user_2oNWGZXvs6aKmHzQmqqBJPglLxz") {
@@ -35,7 +63,7 @@ export async function GET(req: NextRequest) {
       .limit(1000);
 
     const personaCounts = topPersonas?.reduce(
-      (acc, session) => {
+      (acc: Record<string, number>, session: PersonaCountRow) => {
         const slug = session.persona_slug;
         acc[slug] = (acc[slug] || 0) + 1;
         return acc;
@@ -44,7 +72,7 @@ export async function GET(req: NextRequest) {
     ) || {};
 
     const topPersonasList = Object.entries(personaCounts)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a]: [string, number], [, b]: [string, number]) => b - a)
       .slice(0, 5)
       .map(([slug, count]) => ({
         slug,
@@ -69,7 +97,7 @@ export async function GET(req: NextRequest) {
       .limit(15);
 
     const recentSessions =
-      sessions?.map((session: any) => ({
+      sessions?.map((session: RecentSessionRow) => ({
         id: session.id,
         userId: session.user_id,
         personaSlug: session.persona_slug,
