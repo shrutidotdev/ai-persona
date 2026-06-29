@@ -48,9 +48,9 @@ Browser (ChatInterface)
 ## Run locally
 
 ```bash
-pnpm install
+bun install
 cp env .env        # add your OPENAI_API_KEY
-pnpm dev
+bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000), pick a coach, and start pitching.

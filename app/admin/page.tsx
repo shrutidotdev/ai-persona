@@ -31,9 +31,16 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    // For this demo, allow admin access to the user who set it up
-    const adminEmail = "thedeveloper.shruti@gmail.com";
-    if (!user || user.primaryEmailAddress?.emailAddress !== adminEmail) {
+    const configuredAdminEmails = (process.env.NEXT_PUBLIC_CLERK_ADMIN_EMAILS || "thedeveloper.shruti@gmail.com")
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean);
+
+    const isAdmin = user?.emailAddresses?.some(({ emailAddress }) =>
+      configuredAdminEmails.includes(emailAddress.toLowerCase())
+    );
+
+    if (!user || !isAdmin) {
       router.push("/");
       return;
     }
@@ -44,8 +51,12 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       const response = await fetch("/api/admin/stats");
-      if (!response.ok) throw new Error("Failed to fetch stats");
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to fetch stats");
+      }
+
       setStats(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

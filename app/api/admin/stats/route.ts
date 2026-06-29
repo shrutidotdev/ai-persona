@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
 
 type PersonaCountRow = {
@@ -32,11 +32,33 @@ const db = createClient(supabaseUrl, supabaseServiceRoleKey, {
 
 export async function GET() {
   const { userId } = await auth();
+  const user = await currentUser();
 
-  if (!userId || userId !== "user_2oNWGZXvs6aKmHzQmqqBJPglLxz") {
-    // This should match a verified admin user ID from Clerk
-    // For development, replace with your actual admin Clerk user ID
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const configuredAdminEmails = (process.env.CLERK_ADMIN_EMAILS || "thedeveloper.shruti@gmail.com")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+
+  const configuredAdminUserId = process.env.CLERK_ADMIN_USER_ID?.trim();
+
+  const isAdminEmail = user?.emailAddresses?.some(({ emailAddress }) =>
+    configuredAdminEmails.includes(emailAddress.toLowerCase())
+  );
+
+  const isAdminUserId = Boolean(configuredAdminUserId && userId === configuredAdminUserId);
+
+  if (!userId || (!isAdminEmail && !isAdminUserId)) {
+    return Response.json(
+      {
+        error: "Unauthorized. Sign in with an allowed admin Clerk account.",
+        debug: {
+          userId,
+          configuredAdminEmails,
+          configuredAdminUserId,
+        },
+      },
+      { status: 401 }
+    );
   }
 
   try {
@@ -120,7 +142,9 @@ export async function GET() {
   } catch (error) {
     console.error("Admin stats error:", error);
     return Response.json(
-      { error: "Failed to fetch stats" },
+      {
+        error: error instanceof Error ? error.message : "Failed to fetch stats",
+      },
       { status: 500 }
     );
   }
