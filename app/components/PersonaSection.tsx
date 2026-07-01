@@ -26,9 +26,6 @@ export function PersonaSection() {
       <motion.header
         ref={headerRef}
         className="border-b border-white/10 px-6 md:px-28 pt-20 pb-12"
-        // initial={{ opacity: 0, y: 20 }}
-        // animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        // transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-yellow-400">
           Pitch Persona
@@ -56,7 +53,6 @@ export function PersonaSection() {
           animate={headerInView ? { x: 0, opacity: 1 } : { x: -40, opacity: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-         
           <p className="hidden md:block max-w-xs font-mono text-xs text-neutral-400 text-left leading-relaxed">
             Each coach brings a different perspective — from design clarity to
             raw hustle.
@@ -74,7 +70,7 @@ export function PersonaSection() {
 
         <motion.div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[320px] md:auto-rows-[560px]"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[480px] md:auto-rows-[680px]"
           initial="hidden"
           animate={gridInView ? "visible" : "hidden"}
           variants={{

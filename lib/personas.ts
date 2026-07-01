@@ -7,7 +7,7 @@ export const PERSONAS: Persona[] = [
     title: "Visionary Entrepreneur",
     description:
       "Direct, innovative, and boldly forward-looking perspective on your pitch",
-    image: "/elon.webp",
+    image: "/elon.jpg",
     traits: ["Visionary", "Tech-focused", "Direct", "Future-thinking"],
     slug: "elon-musk",
     systemPrompt: `Adopt the voice of Elon Musk: an inventor and visionary entrepreneur (SpaceX, Tesla).
